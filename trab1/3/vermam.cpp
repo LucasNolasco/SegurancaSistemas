@@ -6,28 +6,22 @@ enum Operacao {
     DECIFRAR
 };
 
-int parseComandos(int argc, char* argv[], Operacao* operacao) {
-    std::string opcao_cifrar = "-c";
-    std::string opcao_decifrar = "-d";
-    std::string opcao_k = "-k";
+std::string parseComandos(int argc, char* argv[], Operacao* operacao) {
+    std::string opcao_chave = "-c";
 
-    int k = 0;
-
+    std::string arquivo_chave;
     for(int i = 1; i < argc; i++) {
-        if(argv[i] == opcao_cifrar) {
-            *operacao = CIFRAR;
-        }
-        else if(argv[i] == opcao_decifrar) {
-            *operacao = DECIFRAR;
-        }
-        else if(argv[i] == opcao_k) {
+        if(argv[i] == opcao_chave) {
             if(i + 1 < argc) {
-                sscanf(argv[i + 1], "%d", &k);
+                sscanf(argv[i + 1], "%s", &arquivo_chave);
+            }
+            else {
+                exit(-1); /* TODO: Conferir o que fazer quando o caminho da chave nao for informado */
             }
         }
     }
 
-    return k;
+    return arquivo_chave;
 }
 
 char converter(char original, int k, Operacao operacao) {
@@ -73,7 +67,8 @@ char converter(char original, int k, Operacao operacao) {
 int main(int argc, char *argv[]) {
     Operacao operacao = IDLE;
 
-    int k = parseComandos(argc, argv, &operacao);
+    int k;
+    std::string arquivo_chave = parseComandos(argc, argv, &operacao);
 
     if(operacao == Operacao::IDLE) {
         std::cout << "Operação não informada. Informe -d para decifrar e -c para cifrar" << std::endl;
