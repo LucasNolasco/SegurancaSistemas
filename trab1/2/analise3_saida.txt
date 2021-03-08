@@ -1,0 +1,40 @@
+Frequencias: 
+0, a: 4.83092 %
+1, b: 2.41546 %
+2, c: 2.89855 %
+3, d: 3.38164 %
+4, e: 1.93237 %
+5, f: 3.86473 %
+6, g: 3.38164 %
+7, h: 3.38164 %
+8, i: 0.966184 %
+9, j: 1.44928 %
+10, k: 1.93237 %
+11, l: 3.86473 %
+12, m: 1.93237 %
+13, n: 2.89855 %
+14, o: 2.89855 %
+15, p: 2.89855 %
+16, q: 3.38164 %
+17, r: 5.7971 %
+18, s: 1.44928 %
+19, t: 4.83092 %
+20, u: 4.83092 %
+21, v: 1.93237 %
+22, w: 2.41546 %
+23, x: 3.86473 %
+24, y: 4.34783 %
+25, z: 3.38164 %
+26, 0: 1.93237 %
+27, 1: 0.483092 %
+28, 2: 0.483092 %
+29, 3: 2.41546 %
+30, 4: 2.41546 %
+31, 5: 0.966184 %
+32, 6: 2.89855 %
+33, 7: 2.41546 %
+34, 8: 1.93237 %
+35, 9: 2.89855 %
+
+Texto decifrado com k = 17:
+IjiAC tSzO6o4XWnfd Vxa d3T sjr ZF chXDkj9 UY csYhAe GcPqUw3gHx. M0MqW z4bv4MvbQ6Zi, mtF Lm KA6yKR dYsIvmhh. 9t QDGDJ Ed0 Yx AHIAKGE NPC XjFrC onJrOI LnUaAAQyy2shqGU e pmS9Pg payc m pV8, sDgpLw9D Ac huCXrn 74 RqM3IW l5tB p tOAO9, nhd 5pw. Kqzf80XC tG 0stPt. 

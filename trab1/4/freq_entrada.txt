@@ -1,0 +1,40 @@
+Frequencias: 
+0, a: 14.4928 %
+1, b: 0.966184 %
+2, c: 5.31401 %
+3, d: 2.41546 %
+4, e: 13.0435 %
+5, f: 0.483092 %
+6, g: 1.93237 %
+7, h: 3.38164 %
+8, i: 5.7971 %
+9, j: 0 %
+10, k: 0 %
+11, l: 1.44928 %
+12, m: 6.28019 %
+13, n: 5.7971 %
+14, o: 8.21256 %
+15, p: 2.41546 %
+16, q: 1.93237 %
+17, r: 3.86473 %
+18, s: 11.5942 %
+19, t: 3.86473 %
+20, u: 5.31401 %
+21, v: 0.483092 %
+22, w: 0 %
+23, x: 0.483092 %
+24, y: 0 %
+25, z: 0.483092 %
+26, 0: 0 %
+27, 1: 0 %
+28, 2: 0 %
+29, 3: 0 %
+30, 4: 0 %
+31, 5: 0 %
+32, 6: 0 %
+33, 7: 0 %
+34, 8: 0 %
+35, 9: 0 %
+
+Texto decifrado com k = 0:
+Pouco conhecimento faz com que as pessoas se sintam orgulhosas. Muito conhecimento, que se sintam humildes. Eh assim que as espigas sem graos erguem desdenhosamente a cabeca para o ceu, enquanto as cheias as baixam para a terra, sua mae. Leonardo Da Vinci. 
