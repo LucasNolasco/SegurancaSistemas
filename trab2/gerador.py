@@ -2,6 +2,7 @@
 
 import hashlib
 import os.path
+import binascii
 
 def usuarioExistente(nome):
     if os.path.isfile("semente_" + nome + ".bin") and os.path.isfile("senha_local_" + nome + ".bin"):
@@ -25,6 +26,10 @@ def menu():
     if usuarioExistente(nome):
         semente = carregarSenha("semente_" + nome + ".bin")
         senha_local = carregarSenha("senha_local_" + nome + ".bin")
+
+        # Exemplo de como converter de volta de bytes para hexa, caso necessário
+        # print(binascii.hexlify(semente))
+        # print(binascii.hexlify(senha_local))
 
     else:
         semente = input("Digite um número para ser a semente: ")
