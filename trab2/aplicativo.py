@@ -17,35 +17,22 @@ def carregarSenha(caminho_arquivo):
 
     return senha
 
-def salvarSenha(caminho_arquivo, senha):
-    with open(caminho_arquivo, "wb") as arquivo:
-        arquivo.write(senha)
-
 def login():
     print("------- LOGIN --------")
     nome = input("Digite o nome de usuário: ")
     if usuarioExistente(nome):
-        senha_informada = input("Digite uma senha local: ") # Senha informada pelo usuário no momento de login
-        senha_local = carregarSenha("senha_local_" + nome + ".bin") # Carrega a senha local
-        if senha_local == hashlib.md5(senha_informada.encode()).digest(): # Verifica se a senha informada está correta
-            semente = carregarSenha("semente_" + nome + ".bin")
-        else:
-            print("Senha incorreta!") # Caso seja incorreta, informa o usuário e finaliza o programa
-            exit(-1)
+        semente = carregarSenha("semente_" + nome + ".bin")
+        senha_temporaria = input("Digite a senha temporária: ")
+        senhas = gerar(semente)
 
-        # Exemplo de como converter de volta de bytes para hexa, caso necessário
-        # print(binascii.hexlify(semente))
-        # print(binascii.hexlify(senha_local))
+        if senha_temporaria in senhas:
+            print("Chave validada!")
+        else:
+            print("Chave incorreta!")
 
     else:
-        semente = input("Digite um número para ser a semente: ")
-        senha_local = input("Digite uma senha local: ")
-
-        semente = hashlib.md5(semente.encode()).digest()
-        senha_local = hashlib.md5(senha_local.encode()).digest()
-
-        salvarSenha("semente_" + nome + ".bin", semente)
-        salvarSenha("senha_local_" + nome + ".bin", senha_local)
+        print("Usuário não registrado!")
+        exit(-1)
 
     return semente
 
@@ -54,7 +41,7 @@ def gerar(semente):
     senha = semente + datetime.now().strftime("%d%m%Y%H%M").encode()
     for _ in range(5):
         senha = hashlib.md5(senha).digest()
-        senhas.append(binascii.hexlify(senha)[:6])
+        senhas.append(binascii.hexlify(senha)[:6].decode())
 
     return senhas
 
