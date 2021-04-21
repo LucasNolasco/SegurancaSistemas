@@ -44,7 +44,12 @@ def main():
         "N1": N1.hex()
     }
 
-    requests.get(AUTENTICATION_SERVICE_URL, json=request_data)
+    m2 = requests.get(AUTENTICATION_SERVICE_URL, json=request_data)
+    m2 = m2.json()
+
+    K_c_tgs = cifra_des.decrypt(bytes.fromhex(m2["K_c_tgs"]))
+    N1_recebido = cifra_des.decrypt(bytes.fromhex(m2["N1"])).decode()
+    print(f"K_c_tgs: {K_c_tgs}, N1: {N1_recebido}")
 
 if __name__=='__main__':
     main()
