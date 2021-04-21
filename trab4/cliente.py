@@ -5,6 +5,7 @@ import sys
 import requests
 
 AUTENTICATION_SERVICE_URL = "http://localhost:5000/authentication_service/authenticate"
+TICKET_GRANTING_SERVICE_URL = "http://localhost:5001/ticket_granting_service/get_ticket"
 
 def pad(text):
     while len(text) % 8 != 0:
@@ -31,16 +32,16 @@ def main():
 
     cifra_des = DES.new(key.encode(), DES.MODE_ECB)
 
-    ID_S = cifra_des.encrypt(pad(ID_S).encode())
-    T_R = cifra_des.encrypt(pad(T_R).encode())
+    m1_ID_S = cifra_des.encrypt(pad(ID_S).encode())
+    m1_T_R = cifra_des.encrypt(pad(T_R).encode())
     N1 = random.randint(0, sys.maxsize)
     print(f"N1: {N1}")
     N1 = cifra_des.encrypt(pad(str(N1)).encode())
 
     request_data = {
         "ID_C": ID_C,
-        "ID_S": ID_S.hex(),
-        "T_R": T_R.hex(),
+        "ID_S": m1_ID_S.hex(),
+        "T_R": m1_T_R.hex(),
         "N1": N1.hex()
     }
 
@@ -50,6 +51,24 @@ def main():
     K_c_tgs = cifra_des.decrypt(bytes.fromhex(m2["K_c_tgs"]))
     N1_recebido = cifra_des.decrypt(bytes.fromhex(m2["N1"])).decode()
     print(f"K_c_tgs: {K_c_tgs}, N1: {N1_recebido}")
+
+    cifra_sessao_tgs = DES.new(K_c_tgs, DES.MODE_ECB)
+    m3_ID_C = cifra_sessao_tgs.encrypt(pad(ID_C).encode())
+    m3_ID_S = cifra_sessao_tgs.encrypt(pad(ID_S).encode())
+    m3_T_R = cifra_sessao_tgs.encrypt(pad(T_R).encode())
+    N2 = random.randint(0, sys.maxsize)
+    print(f"N2: {N2}")
+    N2 = cifra_sessao_tgs.encrypt(pad(str(N2)).encode())
+
+    m3 = {
+        "ID_C": m3_ID_C.hex(),
+        "ID_S": m3_ID_S.hex(),
+        "T_R": m3_T_R.hex(),
+        "N2": N2.hex(),
+        "T_c_tgs": m2["T_c_tgs"]
+    }
+
+    m4 = requests.get(TICKET_GRANTING_SERVICE_URL, json=m3)
 
 if __name__=='__main__':
     main()
