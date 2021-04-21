@@ -8,6 +8,10 @@ import os
 from flask import request, Flask
 app = Flask(__name__)
 
+senhas_servicos = {
+    'porta1': 'porta1p1'
+}
+
 senha_tgs = 'tgstgstg'
 
 def pad(text):
@@ -35,7 +39,31 @@ def get_ticket():
     print(f"ID_C: {ID_C}, T_R: {T_R}, K_c_tgs: {K_c_tgs}")
     print(f"ID_C: {ID_C_codificado}, ID_S: {ID_S}, T_R: {T_R_codificado}, N2: {N2}")
 
-    return "OK"
+    K_c_s = os.urandom(8)
+
+    T_c_s = {
+        "ID_C": ID_C.encode().hex(),
+        "T_A": T_R_codificado.encode().hex(),
+        "K_c_s": K_c_s.hex()
+    }
+
+    chave_servico = DES.new(senhas_servicos[ID_S.replace("\x00", "")].encode(), DES.MODE_ECB)
+    T_c_s = chave_servico.encrypt(pad(json.dumps(T_c_s)).encode())
+
+    m4_K_c_s = cifra_sessao_tgs_cliente.encrypt(K_c_s)
+    m4_T_A = cifra_sessao_tgs_cliente.encrypt(pad(T_R_codificado).encode())
+    m4_N2 = cifra_sessao_tgs_cliente.encrypt(pad(N2).encode())
+
+    print(f"K_c_s: {K_c_s}, T_A: {T_R_codificado}, N2: {N2}")
+
+    m4 = {
+        "K_c_s": m4_K_c_s.hex(),
+        "T_A": m4_T_A.hex(),
+        "N2": m4_N2.hex(),
+        "T_c_s": T_c_s.hex()
+    }
+
+    return m4
 
 if __name__ == "__main__":
     app.run(port=5001)

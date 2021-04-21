@@ -69,6 +69,13 @@ def main():
     }
 
     m4 = requests.get(TICKET_GRANTING_SERVICE_URL, json=m3)
+    m4 = m4.json()
+
+    K_c_s = cifra_sessao_tgs.decrypt(bytes.fromhex(m4["K_c_s"]))
+    T_A = cifra_sessao_tgs.decrypt(bytes.fromhex(m4["T_A"])).decode()
+    N2_recebido = cifra_sessao_tgs.decrypt(bytes.fromhex(m4["N2"])).decode()
+
+    print(f"K_c_s: {K_c_s}, T_A: {T_A}, N2: {N2_recebido}")
 
 if __name__=='__main__':
     main()
