@@ -6,6 +6,7 @@ import requests
 
 AUTENTICATION_SERVICE_URL = "http://localhost:5000/authentication_service/authenticate"
 TICKET_GRANTING_SERVICE_URL = "http://localhost:5001/ticket_granting_service/get_ticket"
+SERVICE_URL = "http://localhost:5002/service/"
 
 def pad(text):
     while len(text) % 8 != 0:
@@ -29,6 +30,8 @@ def menu():
 
 def main():
     ID_C, ID_S, T_R, key = menu()
+
+    S_R = input("Digite o serviço desejado: ")
 
     cifra_des = DES.new(key.encode(), DES.MODE_ECB)
 
@@ -76,6 +79,35 @@ def main():
     N2_recebido = cifra_sessao_tgs.decrypt(bytes.fromhex(m4["N2"])).decode()
 
     print(f"K_c_s: {K_c_s}, T_A: {T_A}, N2: {N2_recebido}")
+
+    # ================ Cria M5 ==================================
+
+    cifra_sessao_servico = DES.new(K_c_s, DES.MODE_ECB)
+    m5_ID_C = cifra_sessao_servico.encrypt(pad(ID_C).encode())
+    m5_T_A = cifra_sessao_servico.encrypt(pad(T_A).encode())
+    m5_S_R = cifra_sessao_servico.encrypt(pad(S_R).encode())
+    N3 = random.randint(0, sys.maxsize)
+    m5_N3 = cifra_sessao_servico.encrypt(pad(str(N3)).encode())
+
+    m5 = {
+        "ID_C": m5_ID_C.hex(),
+        "T_A": m5_T_A.hex(),
+        "S_R": m5_S_R.hex(),
+        "N3": m5_N3.hex(),
+        "T_c_s": m4["T_c_s"]
+    }
+
+    print(f"N3: {N3}")
+
+    m6 = requests.get(SERVICE_URL + ID_S, json=m5)
+    
+    # =============== Lê M6 =====================================
+    m6 = m6.json()
+
+    resposta = cifra_sessao_servico.decrypt(bytes.fromhex(m6["Resposta"])).decode()
+    m6_N3 = cifra_sessao_servico.decrypt(bytes.fromhex(m6["N3"])).decode()
+
+    print(f"Resposta: {resposta}, N3: {m6_N3}")
 
 if __name__=='__main__':
     main()
