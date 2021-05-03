@@ -9,16 +9,6 @@ app = Flask(__name__)
 
 # =======================================
 
-senhas_servicos = {
-    'porta1': 'porta1p1'
-}
-
-# =======================================
-
-senha_tgs = 'tgstgstg'
-
-# =======================================
-
 def pad(text):
     while len(text) % 8 != 0:
         text += '\x00'
@@ -27,11 +17,27 @@ def pad(text):
 
 # =======================================
 
+def load_passwd(path):
+    '''
+        Função para carregar o hash da senha armazenado
+        no arquivo txt
+    '''
+    with open(path, "r") as arq:
+        senha = arq.readline()
+        senha = bytes.fromhex(senha)
+    
+    senha = senha[:8] # Limita no tamanho necessário para o DES
+
+    return senha
+
+# =======================================
+
 @app.route("/ticket_granting_service/get_ticket")
 def get_ticket():
     m3 = request.get_json() # Obtém a m3
 
-    cifra_des = DES.new(senha_tgs.encode(), DES.MODE_ECB)
+    senha_tgs = load_passwd("TGS/tgs.txt")
+    cifra_des = DES.new(senha_tgs, DES.MODE_ECB)
     try: # Tenta descriptografar o ticket
         T_c_tgs = json.loads(cifra_des.decrypt(bytes.fromhex(m3["T_c_tgs"])).decode().replace("\x00", ""))
         ID_C = bytes.fromhex(T_c_tgs["ID_C"]).decode()
@@ -67,11 +73,11 @@ def get_ticket():
     }
     
     ID_S = ID_S.replace("\x00", "") # Remove o padding do ID
-    if ID_S not in senhas_servicos: # Verifica se o serviço desejado existe
+    if not os.path.isfile("TGS/servicos/" + ID_S + ".txt"): # Verifica se o serviço desejado existe
         return {"erro": "Serviço solicitado não existe"}
 
-    senha_servico = senhas_servicos[ID_S] # Obtém a chave do serviço armazenada no TGS
-    chave_servico = DES.new(senha_servico.encode(), DES.MODE_ECB) 
+    senha_servico = load_passwd("TGS/servicos/" + ID_S + ".txt") # Obtém a chave do serviço armazenada no TGS
+    chave_servico = DES.new(senha_servico, DES.MODE_ECB) 
     T_c_s = chave_servico.encrypt(pad(json.dumps(T_c_s)).encode()) # Criptografa o ticket
 
     m4_K_c_s = cifra_sessao_tgs_cliente.encrypt(K_c_s) # Criptografa os demais itens da mensagem

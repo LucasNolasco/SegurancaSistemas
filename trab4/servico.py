@@ -9,12 +9,6 @@ app = Flask(__name__)
 
 # ====================================
 
-senhas_servicos = {
-    'porta1': 'porta1p1'
-}
-
-# ====================================
-
 def pad(text):
     while len(text) % 8 != 0:
         text += '\x00'
@@ -22,11 +16,27 @@ def pad(text):
 
 # ====================================
 
+def load_passwd(path):
+    '''
+        Função para carregar o hash da senha armazenado
+        no arquivo txt
+    '''
+    with open(path, "r") as arq:
+        senha = arq.readline()
+        senha = bytes.fromhex(senha)
+    
+    senha = senha[:8] # Limita no tamanho necessário para o DES
+
+    return senha
+
+# ====================================
+
 @app.route("/service/porta1")
 def service_porta1():
     m5 = request.get_json()
 
-    cifra_des = DES.new(senhas_servicos["porta1"].encode(), DES.MODE_ECB) # Carrega a chave do serviço
+    senha_porta1 = load_passwd("Servico/porta1.txt")
+    cifra_des = DES.new(senha_porta1, DES.MODE_ECB) # Carrega a chave do serviço
     try: # Tenta descriptografar o ticket para verificar se ele é válido
         T_c_s = json.loads(cifra_des.decrypt(bytes.fromhex(m5["T_c_s"])).decode().replace("\x00", ""))
         ID_C = bytes.fromhex(T_c_s["ID_C"]).decode()

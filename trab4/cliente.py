@@ -5,6 +5,7 @@ from Crypto.Cipher import DES
 import random
 import sys
 import requests
+import hashlib
 
 # =======================================
 
@@ -42,12 +43,10 @@ def menu():
     T_R = input("Insira o prazo de validade para acesso ao serviço em segundos: ")
     T_R = str(time.time() + int(T_R)) # Adiciona o intervalo de tempo desejado no timestamp atual
 
-    tamanho_chave_correto = False
-    while not tamanho_chave_correto:
-        key = input(f"Digite a chave para criptografar (A chave deverá ter exatamente {DES.key_size} caracteres): ")
-        tamanho_chave_correto = True
-        if len(key) == DES.key_size:
-            tamanho_chave_correto = True
+    
+    key = input(f"Digite a chave para criptografar: ")
+    key = hashlib.md5(key.encode()).digest() # Cria o hash da chave
+    key = key[:8] # Corta o hash da chave no tamanho necessário para o DES
 
     return ID_C, ID_S, T_R, S_R, key
 
@@ -58,7 +57,7 @@ def main():
 
     # ========================= Envia a M1 ====================================
 
-    cifra_des = DES.new(key.encode(), DES.MODE_ECB) # Cria a instância de criptografia simétrica
+    cifra_des = DES.new(key, DES.MODE_ECB) # Cria a instância de criptografia simétrica
     m1_ID_S = cifra_des.encrypt(pad(ID_S).encode()) # Criptografa o ID do usuário
     m1_T_R = cifra_des.encrypt(pad(T_R).encode()) # Criptografa o timeout solicitado
     N1 = random.randint(0, sys.maxsize) # Gera o número aleatório
