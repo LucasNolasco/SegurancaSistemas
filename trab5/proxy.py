@@ -1,5 +1,5 @@
 import os
-import _thread
+import threading
 import socket
 
 class WebServer:
@@ -14,11 +14,12 @@ class WebServer:
         while True:
             (con, (ip, porta)) = tcp.accept()
                 
-            request = HttpRequest(con)
-            _thread.start_new_thread(request.run, ())
+            request_thread = HttpRequest(con)
+            request_thread.start()
                 
-class HttpRequest():
+class HttpRequest(threading.Thread):
     def __init__(self, request_socket):
+        threading.Thread.__init__(self)
         self.request_socket = request_socket
         self.CRLF = "\r\n"
 
