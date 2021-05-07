@@ -1,12 +1,14 @@
 import os
 import threading
 import socket
+from signal import signal, SIGINT
+import sys
 
 class WebServer:
     def main(self):
-        port = 5000
+        port = 5001
         host = 'localhost'
-        
+
         tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         tcp.bind((host, port))
         tcp.listen(1)
@@ -24,11 +26,43 @@ class HttpRequest(threading.Thread):
         self.CRLF = "\r\n"
 
     def run(self):
-        try:
-            # self.processRequest()
-            print(self.request_socket.recv(1024))
-        except:
-            print("Falha na execucao")
+        self.request_socket.settimeout(20)
+        input_stream = b''
+        while True:
+            stream_slice = self.request_socket.recv(4096)
+            input_stream += stream_slice
+            if len(stream_slice) < 4096: # Se não tem mais nada a receber
+                break
+
+        input_stream = input_stream.decode()
+
+        # input_stream = self.request_socket.recv(4096).decode()
+
+        print(input_stream)
+        original_host = input_stream.split(self.CRLF)[1].replace("Host: ", "")
+        print(original_host)
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(10)
+        s.connect((original_host, 80))
+        s.sendall(input_stream.encode())
+
+        data = b''
+        while True:
+            stream_slice = s.recv(4096)
+            if not stream_slice:
+                break
+            
+            data += stream_slice                
+
+        print(data)
+
+        s.shutdown(socket.SHUT_RDWR)
+        s.close()
+
+        self.request_socket.sendall(data)
+
+        self.request_socket.shutdown(socket.SHUT_RDWR)        
+        self.request_socket.close()
 
     def processRequest(self):
         input_stream = self.request_socket.recv(1024)
@@ -101,4 +135,7 @@ class HttpRequest(threading.Thread):
 
 if __name__ == '__main__':
     server = WebServer()
-    server.main()
+    try:
+        server.main()
+    except KeyboardInterrupt:
+        sys.exit(1)
