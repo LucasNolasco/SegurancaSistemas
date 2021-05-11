@@ -26,35 +26,41 @@ class HttpRequest(threading.Thread):
         self.CRLF = "\r\n"
 
     def run(self):
-        self.request_socket.settimeout(20)
+        self.request_socket.settimeout(1)
         input_stream = b''
         while True:
-            stream_slice = self.request_socket.recv(4096)
-            input_stream += stream_slice
-            if len(stream_slice) < 4096: # Se não tem mais nada a receber
+            try:
+                stream_slice = self.request_socket.recv(4096)
+                input_stream += stream_slice
+                if len(stream_slice) < 4096: # Se não tem mais nada a receber
+                    break
+            except:
                 break
 
         input_stream = input_stream.decode()
 
         # input_stream = self.request_socket.recv(4096).decode()
 
-        print(input_stream)
+        # print(input_stream)
         original_host = input_stream.split(self.CRLF)[1].replace("Host: ", "")
-        print(original_host)
+        # print(original_host)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(10)
+        s.settimeout(0.25)
         s.connect((original_host, 80))
         s.sendall(input_stream.encode())
 
         data = b''
         while True:
-            stream_slice = s.recv(4096)
-            if not stream_slice:
+            try:
+                stream_slice = s.recv(4096)
+                if not stream_slice:
+                    break
+                
+                data += stream_slice                
+            except:
                 break
-            
-            data += stream_slice                
 
-        print(data)
+        # print(data)
 
         s.shutdown(socket.SHUT_RDWR)
         s.close()
