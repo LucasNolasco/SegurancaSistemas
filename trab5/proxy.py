@@ -4,10 +4,13 @@ import socket
 from signal import signal, SIGINT
 import sys
 import syslog
+import hashlib
 
 def main():
     port = 5001
     host = 'localhost'
+
+    checarIntegridade()
 
     tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Configura o socket que o proxy irá ouvir
     tcp.bind((host, port))
@@ -22,6 +25,19 @@ def main():
         request_thread = HttpRequest(con, ip) # Cria uma thread para lidar com cada nova conexão
         request_thread.start()
                 
+def checarIntegridade():
+    with open("proxy.py", "rb") as f:
+        bytes = f.read() # read file as bytes
+        current_hash = hashlib.md5(bytes).hexdigest()
+
+    with open("MD5.txt", "r") as f:
+        correct_hash = f.readline()
+
+    if current_hash != correct_hash:
+        syslog.syslog(f"Falha ao verificar a integridade do arquivo de proxy. Hash correto: {correct_hash}, Hash encontrado: {current_hash}")
+        print(f"Falha ao verificar a integridade do arquivo de proxy. Hash correto: {correct_hash}, Hash encontrado: {current_hash}")
+        exit(-1)
+
 class HttpRequest(threading.Thread):
     '''
         Nome: HttpRequest
